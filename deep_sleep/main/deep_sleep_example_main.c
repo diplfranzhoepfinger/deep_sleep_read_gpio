@@ -24,6 +24,24 @@
 #include "nvs_flash.h"
 #include "nvs.h"
 
+
+
+#define EXAMPLE_BUTTON_GPIO     10
+
+
+
+static void initialise_button(void)
+{
+    gpio_config_t io_conf = {0};
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.pin_bit_mask = BIT64(EXAMPLE_BUTTON_GPIO);
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = 1;
+    io_conf.pull_down_en = 0;
+    gpio_config(&io_conf);
+}
+
+
 #if SOC_RTC_FAST_MEM_SUPPORTED
 static RTC_DATA_ATTR struct timeval sleep_enter_time;
 #else
@@ -132,6 +150,18 @@ void app_main(void)
         default:
             printf("Not a deep sleep reset\n");
     }
+
+    initialise_button();
+
+
+    bool new_level;
+    new_level = gpio_get_level(EXAMPLE_BUTTON_GPIO);
+    printf("GPIO %i status = %i  ##\n", EXAMPLE_BUTTON_GPIO, new_level);
+
+
+
+
+
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
